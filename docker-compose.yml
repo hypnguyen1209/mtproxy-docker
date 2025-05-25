@@ -71,11 +71,22 @@ services:
       - TAG=${TAG:-}
       - WORKERS=${WORKERS:-1}
       - PORT=443
-      - HTTP_STATS=1
+      - HTTP_STATS=1    
     command: >
       /bin/sh -c "curl -s https://core.telegram.org/getProxySecret -o /data/proxy-secret &&
                   curl -s https://core.telegram.org/getProxyConfig -o /data/proxy-multi.conf &&
                   if [ ! -f /data/secret ]; then head -c 16 /dev/urandom | xxd -ps > /data/secret; fi &&
                   SECRET=$$(cat /data/secret) &&
                   if [ -z \"$$TAG\" ]; then TAG=''; else TAG='-P $$TAG'; fi &&
+                  PUBLIC_IP=$$(curl -s https://api.ipify.org) &&
+                  echo \"=========================================================\" &&
+                  echo \"MTProxy is starting with the following connection URLs:\" &&
+                  echo \"\" &&
+                  echo \"Web URL: https://t.me/proxy?server=$$PUBLIC_IP&port=$$PORT&secret=$$SECRET\" &&
+                  echo \"TG URL:  tg://proxy?server=$$PUBLIC_IP&port=$$PORT&secret=$$SECRET\" &&
+                  echo \"\" &&
+                  echo \"For secure random padding, use:\" &&
+                  echo \"Web URL: https://t.me/proxy?server=$$PUBLIC_IP&port=443&secret=dd$$SECRET\" &&
+                  echo \"TG URL:  tg://proxy?server=$$PUBLIC_IP&port=443&secret=dd$$SECRET\" &&
+                  echo \"=========================================================\" &&
                   /bin/mtproto-proxy -u nobody -p 8888 -H 443 -S $$SECRET $$TAG --aes-pwd proxy-secret proxy-multi.conf -M $$WORKERS --http-stats"
