@@ -65,7 +65,8 @@ services:
     ports:
       - "443:443"
     volumes:
-      - ./config:/data    environment:
+      - ./config:/data    
+    environment:
       - SECRET=${SECRET:-eecb9d7f03155b1419a3bfb475106d8a}
       - TAG=${TAG:-}
       - WORKERS=${WORKERS:-1}
