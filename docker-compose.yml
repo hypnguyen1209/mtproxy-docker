@@ -1,0 +1,80 @@
+version: '3'
+
+services:
+  mtproxy:
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM ubuntu:22.04 as builder
+
+        # Set noninteractive installation
+        ENV DEBIAN_FRONTEND=noninteractive
+
+        # Install dependencies
+        RUN apt-get update && apt-get install -y \
+            git \
+            curl \
+            build-essential \
+            libssl-dev \
+            zlib1g-dev \
+            && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+        # Clone and build MTProxy
+        WORKDIR /opt
+        RUN git clone https://github.com/GetPageSpeed/MTProxy.git
+        WORKDIR /opt/MTProxy
+
+        # Modify Makefile to add -fcommon (fix for newer gcc versions)
+        RUN sed -i 's/COMMON_CFLAGS :=/COMMON_CFLAGS := -fcommon /g' Makefile
+
+        # Build the proxy
+        RUN make
+
+        FROM ubuntu:22.04
+
+        # Install dependencies for running
+        RUN apt-get update && apt-get install -y \
+            curl \
+            xxd \
+            libssl3 \
+            zlib1g \
+            && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+        # Copy built binary from builder stage
+        COPY --from=builder /opt/MTProxy/objs/bin/mtproto-proxy /bin/mtproto-proxy
+
+        # Create necessary directories
+        RUN mkdir -p /data
+
+        # Expose ports
+        EXPOSE 443
+        EXPOSE 8888
+
+        WORKDIR /data
+
+        # Set default environment variables
+        ENV PORT=443 \
+            WORKERS=1 \
+            HTTP_STATS=1
+
+        VOLUME ["/data"]
+
+        # Default command will be passed by docker-compose, but provide one here as a fallback
+        CMD ["/bin/mtproto-proxy"]
+    restart: unless-stopped
+    ports:
+      - "443:443"
+    volumes:
+      - ./config:/data    environment:
+      - SECRET=${SECRET:-eecb9d7f03155b1419a3bfb475106d8a}
+      - TAG=${TAG:-}
+      - WORKERS=${WORKERS:-1}
+      - PORT=443
+      - HTTP_STATS=1
+    command: >
+      /bin/sh -c "curl -s https://core.telegram.org/getProxySecret -o /data/proxy-secret &&
+                  curl -s https://core.telegram.org/getProxyConfig -o /data/proxy-multi.conf &&
+                  if [ ! -f /data/secret ]; then head -c 16 /dev/urandom | xxd -ps > /data/secret; fi &&
+                  SECRET=$$(cat /data/secret) &&
+                  if [ -z \"$$TAG\" ]; then TAG=''; else TAG='-P $$TAG'; fi &&
+                  /bin/mtproto-proxy -u nobody -p 8888 -H 443 -S $$SECRET $$TAG --aes-pwd proxy-secret proxy-multi.conf -M $$WORKERS --http-stats"

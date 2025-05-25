@@ -1,0 +1,10 @@
+# Ignore configuration files with secrets
+config/
+.env
+
+# Docker
+.docker/
+
+# System files
+.DS_Store
+Thumbs.db
