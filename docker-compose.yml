@@ -65,13 +65,14 @@ services:
     ports:
       - "443:443"
     volumes:
-      - ./config:/data    
+      - ./config:/data
     environment:
       - SECRET=${SECRET:-eecb9d7f03155b1419a3bfb475106d8a}
       - TAG=${TAG:-}
       - WORKERS=${WORKERS:-1}
       - PORT=443
-      - HTTP_STATS=1    
+      - HTTP_STATS=1
+      - SOCKS5_PROXY=${SOCKS5_PROXY:-}
     command: >
       /bin/sh -c "curl -s https://core.telegram.org/getProxySecret -o /data/proxy-secret &&
                   curl -s https://core.telegram.org/getProxyConfig -o /data/proxy-multi.conf &&
@@ -89,4 +90,5 @@ services:
                   echo \"Web URL: https://t.me/proxy?server=$$PUBLIC_IP&port=443&secret=dd$$SECRET\" &&
                   echo \"TG URL:  tg://proxy?server=$$PUBLIC_IP&port=443&secret=dd$$SECRET\" &&
                   echo \"=========================================================\" &&
-                  /bin/mtproto-proxy -u nobody -p 8888 -H 443 -S $$SECRET $$TAG --aes-pwd proxy-secret proxy-multi.conf -M $$WORKERS --http-stats"
+                  if [ -n \"$$SOCKS5_PROXY\" ]; then SOCKS5_ARG=\"-x $$SOCKS5_PROXY\"; else SOCKS5_ARG=\"\"; fi &&
+                  /bin/mtproto-proxy -u nobody -p 8888 -H 443 -S $$SECRET $$TAG --aes-pwd proxy-secret proxy-multi.conf -M $$WORKERS --http-stats $$SOCKS5_ARG"

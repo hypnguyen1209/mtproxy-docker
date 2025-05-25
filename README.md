@@ -35,10 +35,18 @@ You can configure the MTProxy by setting environment variables:
 - `SECRET`: Your proxy secret (will be generated automatically if not provided)
 - `TAG`: Proxy tag for channel promotion (optional)
 - `WORKERS`: Number of workers (default: 1)
+- `SOCKS5_PROXY`: SOCKS5 proxy to route traffic through (format: `server:port` or `server:port:user:password`)
 
-Example:
+Examples:
 ```bash
+# Set a promotion TAG
 TAG=1234567890abcdef docker-compose up -d
+
+# Run through a SOCKS5 proxy
+SOCKS5_PROXY=192.168.1.1:1080 docker-compose up -d
+
+# Run through a SOCKS5 proxy with authentication
+SOCKS5_PROXY=192.168.1.1:1080:username:password docker-compose up -d
 ```
 
 ### View Proxy Secret
