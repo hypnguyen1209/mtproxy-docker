@@ -90,4 +90,3 @@ services:
                   echo \"TG URL:  tg://proxy?server=$$PUBLIC_IP&port=443&secret=dd$$SECRET\" &&
                   echo \"=========================================================\" &&
                   /bin/mtproto-proxy -u nobody -p 8888 -H 443 -S $$SECRET $$TAG --aes-pwd proxy-secret proxy-multi.conf -M $$WORKERS --http-stats"
->>>>>>> parent of eab73c7 (print log proxy url)
