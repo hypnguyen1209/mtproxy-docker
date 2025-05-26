@@ -10,7 +10,6 @@ show_help() {
     echo "  start         Start the MTProxy service"
     echo "  stop          Stop the MTProxy service"
     echo "  restart       Restart the MTProxy service"
-    echo "  socks5        Configure SOCKS5 proxy settings"
     echo "  status        Show proxy status"
     echo "  secret        Display the current proxy secret"
     echo "  link          Generate Telegram proxy link (requires IP address)"
@@ -105,33 +104,6 @@ case "$1" in
     logs)
         check_docker
         docker-compose logs -f
-        ;;
-        
-    socks5)
-        check_docker
-        echo "Configure SOCKS5 proxy for MTProxy"
-        echo "Enter SOCKS5 proxy details (format: server:port or server:port:username:password):"
-        echo "Leave empty to disable SOCKS5 proxy"
-        read -r SOCKS5_PROXY
-        
-        # Create or update .env file
-        if [ -f .env ]; then
-            grep -v "^SOCKS5_PROXY=" .env > .env.tmp && mv .env.tmp .env
-        else
-            touch .env
-        fi
-        
-        if [ -n "$SOCKS5_PROXY" ]; then
-            echo "SOCKS5_PROXY=$SOCKS5_PROXY" >> .env
-            echo "SOCKS5 proxy configured: $SOCKS5_PROXY"
-        else
-            echo "SOCKS5 proxy disabled"
-        fi
-        
-        # Restart for changes to take effect
-        echo "Restarting MTProxy to apply changes..."
-        docker-compose down
-        docker-compose up -d
         ;;
         
     update)
