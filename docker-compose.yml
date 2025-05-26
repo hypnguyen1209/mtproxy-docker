@@ -79,6 +79,7 @@ services:
                   SECRET=$$(cat /data/secret) &&
                   if [ -z \"$$TAG\" ]; then TAG=''; else TAG='-P $$TAG'; fi &&
                   PUBLIC_IP=$$(curl -s https://api.ipify.org) &&
+                  NAT_IP=\$$(hostname -I | cut -d' ' -f1) &&
                   echo \"=========================================================\" &&
                   echo \"MTProxy is starting with the following connection URLs:\" &&
                   echo \"\" &&
@@ -89,4 +90,4 @@ services:
                   echo \"Web URL: https://t.me/proxy?server=$$PUBLIC_IP&port=443&secret=dd$$SECRET\" &&
                   echo \"TG URL:  tg://proxy?server=$$PUBLIC_IP&port=443&secret=dd$$SECRET\" &&
                   echo \"=========================================================\" &&
-                  /bin/mtproto-proxy -u nobody -p 8888 -H 443 -S $$SECRET $$TAG --aes-pwd proxy-secret proxy-multi.conf -M $$WORKERS --http-stats"
+                  /bin/mtproto-proxy -u nobody -p 8888 -H 443 -S $$SECRET $$TAG --aes-pwd proxy-secret proxy-multi.conf -M $$WORKERS --http-stats --nat-info \$$NAT_IP:\$$PUBLIC_IP"
