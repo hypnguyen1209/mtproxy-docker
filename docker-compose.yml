@@ -73,7 +73,10 @@ services:
       - PORT=443
       - HTTP_STATS=1
 <<<<<<< HEAD
+<<<<<<< HEAD
       - SOCKS5_PROXY=${SOCKS5_PROXY:-}
+=======
+>>>>>>> parent of eab73c7 (print log proxy url)
 =======
 >>>>>>> parent of eab73c7 (print log proxy url)
     command: >
@@ -82,6 +85,7 @@ services:
                   if [ ! -f /data/secret ]; then head -c 16 /dev/urandom | xxd -ps > /data/secret; fi &&
                   SECRET=$$(cat /data/secret) &&
                   if [ -z \"$$TAG\" ]; then TAG=''; else TAG='-P $$TAG'; fi &&
+<<<<<<< HEAD
 <<<<<<< HEAD
                   PUBLIC_IP=$$(curl -s https://api.ipify.org) &&
                   echo \"=========================================================\" &&
@@ -97,5 +101,7 @@ services:
                   if [ -n \"$$SOCKS5_PROXY\" ]; then SOCKS5_ARG=\"-x $$SOCKS5_PROXY\"; else SOCKS5_ARG=\"\"; fi &&
                   /bin/mtproto-proxy -u nobody -p 8888 -H 443 -S $$SECRET $$TAG --aes-pwd proxy-secret proxy-multi.conf -M $$WORKERS --http-stats $$SOCKS5_ARG"
 =======
+=======
+>>>>>>> parent of eab73c7 (print log proxy url)
                   /bin/mtproto-proxy -u nobody -p 8888 -H 443 -S $$SECRET $$TAG --aes-pwd proxy-secret proxy-multi.conf -M $$WORKERS --http-stats"
 >>>>>>> parent of eab73c7 (print log proxy url)
