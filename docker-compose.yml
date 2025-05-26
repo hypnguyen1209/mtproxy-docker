@@ -79,7 +79,7 @@ services:
                   SECRET=$$(cat /data/secret) &&
                   if [ -z \"$$TAG\" ]; then TAG=''; else TAG='-P $$TAG'; fi &&
                   PUBLIC_IP=$$(curl -s https://api.ipify.org) &&
-                  NAT_IP=\$$(hostname -I | cut -d' ' -f1) &&
+                  NAT_IP=$$(hostname -I | cut -d' ' -f1) &&
                   echo \"=========================================================\" &&
                   echo \"MTProxy is starting with the following connection URLs:\" &&
                   echo \"\" &&
